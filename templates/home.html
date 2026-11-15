@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import food_card %}
+{% block content %}
+<section class="hero"><div class="container"><div class="row align-items-center g-4">
+  <div class="col-lg-6">
+    <span class="badge rounded-pill text-bg-warning mb-3 px-3 py-2"><i class="bi bi-lightning-charge-fill"></i> Hot &amp; fresh in 30 minutes</span>
+    <h1 class="mb-3">Delicious food, <span>delivered</span> to your door</h1>
+    <p class="lead text-muted mb-4">Browse our menu of biryanis, curries, fast food and desserts. Order in a few taps and pay with cash on delivery.</p>
+    <form class="hero-search" action="{{ url_for('menu') }}"><input name="q" class="form-control" placeholder="Search biryani, pizza, lassi…"><button class="btn btn-brand px-4"><i class="bi bi-search"></i></button></form>
+  </div>
+  <div class="col-lg-6"><div class="hero-collage">{% for i in hero %}<img src="{{ i|food_img }}" alt="{{ i.name }}">{% endfor %}</div></div>
+</div></div></section>
+
+<section class="container my-5">
+  <h3 class="mb-3">Browse by category</h3>
+  <div class="d-flex flex-wrap gap-2">
+    {% for c in categories %}<a class="cat-chip" href="{{ url_for('menu', category=c.id) }}"><i class="bi bi-circle-fill small text-warning"></i> {{ c.name }}</a>{% endfor %}
+  </div>
+</section>
+
+<section class="container my-5">
+  <div class="d-flex justify-content-between align-items-end mb-3"><h3 class="mb-0">Popular dishes</h3><a href="{{ url_for('menu') }}">See full menu <i class="bi bi-arrow-right"></i></a></div>
+  <div class="row g-4">{% for item in featured %}<div class="col-6 col-md-4 col-lg-3">{{ food_card(item) }}</div>{% endfor %}</div>
+</section>
+
+<section class="container my-5">
+  <h3 class="text-center mb-4">How it works</h3>
+  <div class="row g-4">
+    <div class="col-md-4"><div class="card-soft step-card h-100"><div class="step-icon"><i class="bi bi-search-heart"></i></div><h5>1. Choose</h5><p class="text-muted mb-0">Pick your favourites from the menu.</p></div></div>
+    <div class="col-md-4"><div class="card-soft step-card h-100"><div class="step-icon"><i class="bi bi-bag-check"></i></div><h5>2. Order</h5><p class="text-muted mb-0">Add to cart and confirm with Cash on Delivery.</p></div></div>
+    <div class="col-md-4"><div class="card-soft step-card h-100"><div class="step-icon"><i class="bi bi-bicycle"></i></div><h5>3. Track &amp; enjoy</h5><p class="text-muted mb-0">Follow your order live until it arrives.</p></div></div>
+  </div>
+</section>
+{% endblock %}

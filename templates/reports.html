@@ -1,0 +1,23 @@
+{% extends 'dashboard_base.html' %}
+{% from '_macros.html' import badge %}
+{% block title %}Order reports{% endblock %}
+{% block dash %}
+<div class="dash-title"><h2 class="mb-0">Order Reports</h2>
+  <div class="btn-group">{% for d in (7, 30, 90) %}<a class="btn {{ 'btn-brand' if days == d else 'btn-outline-brand' }}" href="{{ url_for('reports', days=d) }}">{{ d }} days</a>{% endfor %}</div></div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="stat-card g1"><div class="label">Revenue</div><div class="value">{{ summary.revenue|inr }}</div><i class="bi bi-currency-rupee ico"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card g2"><div class="label">Orders</div><div class="value">{{ summary.orders }}</div><small>{{ summary.delivered }} delivered</small><i class="bi bi-receipt ico"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card g3"><div class="label">Average order</div><div class="value">{{ summary.avg|inr }}</div><i class="bi bi-calculator ico"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card g5"><div class="label">Cancelled / rejected</div><div class="value">{{ summary.cancelled }}</div><i class="bi bi-x-circle ico"></i></div></div>
+</div>
+<div class="card-soft p-4 mb-4"><h5>Daily revenue</h5><canvas id="revChart" height="90"></canvas></div>
+<div class="row g-3">
+  <div class="col-lg-4"><div class="card-soft p-4 h-100"><h5>Orders by status</h5>{% for s, n in by_status.items() %}<div class="d-flex justify-content-between py-2 border-bottom">{{ badge(s) }}<strong>{{ n }}</strong></div>{% endfor %}</div></div>
+  <div class="col-lg-4"><div class="card-soft p-4 h-100"><h5>Top dishes</h5>{% for item, qty, rev in top %}<div class="top-row"><img class="thumb" src="{{ item|food_img }}" alt=""><div class="flex-grow-1"><div class="fw-semibold">{{ item.name }}</div><small class="text-muted">{{ qty }} sold</small></div><strong>{{ rev|inr }}</strong></div>{% else %}<p class="text-muted">No delivered orders in this period.</p>{% endfor %}</div></div>
+  <div class="col-lg-4"><div class="card-soft p-4 h-100"><h5>Revenue by category</h5>{% for name, rev in by_category %}<div class="d-flex justify-content-between py-2 border-bottom"><span>{{ name }}</span><strong>{{ rev|inr }}</strong></div>{% else %}<p class="text-muted">No data yet.</p>{% endfor %}</div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>const c = {{ chart|tojson }};
+new Chart(document.getElementById('revChart'), {type:'bar', data:{labels:c.labels, datasets:[{label:'Revenue (₹)', data:c.revenue, backgroundColor:'#f76707', borderRadius:8}]}, options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}, x:{grid:{display:false}}}}});</script>{% endblock %}

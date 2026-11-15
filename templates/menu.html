@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import food_card %}
+{% block title %}Menu{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-3">Our Menu</h2>
+  <form class="row g-2 mb-3" method="get">
+    <div class="col-md-8"><input class="form-control" name="q" value="{{ q }}" placeholder="Search for a dish…"></div>
+    {% if selected %}<input type="hidden" name="category" value="{{ selected }}">{% endif %}
+    <div class="col-md-4 d-grid"><button class="btn btn-brand"><i class="bi bi-search"></i> Search</button></div>
+  </form>
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a class="cat-chip {{ 'active' if not selected }}" href="{{ url_for('menu', q=q or None) }}">All</a>
+    {% for c in categories %}<a class="cat-chip {{ 'active' if selected == c.id }}" href="{{ url_for('menu', category=c.id, q=q or None) }}">{{ c.name }}</a>{% endfor %}
+  </div>
+  {% if items %}<div class="row g-4">{% for item in items %}<div class="col-6 col-md-4 col-lg-3">{{ food_card(item) }}</div>{% endfor %}</div>
+  {% else %}<div class="empty"><i class="bi bi-emoji-frown"></i><h5 class="mt-2">No dishes found</h5><p>Try a different search or category.</p></div>{% endif %}
+</div>
+{% endblock %}

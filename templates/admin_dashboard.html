@@ -1,0 +1,35 @@
+{% extends 'dashboard_base.html' %}
+{% from '_macros.html' import badge %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block dash %}
+<div class="dash-title"><div><h2 class="mb-0">Admin Dashboard</h2><span class="text-muted">Hello {{ g.user.name.split()[0] }}, here is how the restaurant is doing.</span></div>
+  <a class="btn btn-brand" href="{{ url_for('food_form') }}"><i class="bi bi-plus-lg"></i> Add food item</a></div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-xl-3"><div class="stat-card g1"><div class="label">Total revenue</div><div class="value">{{ stats.revenue|inr }}</div><small>Delivered orders</small><i class="bi bi-currency-rupee ico"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card g2"><div class="label">Total orders</div><div class="value">{{ stats.orders }}</div><small>{{ stats.pending }} pending now</small><i class="bi bi-receipt ico"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card g3"><div class="label">Customers</div><div class="value">{{ stats.customers }}</div><small>Registered</small><i class="bi bi-people ico"></i></div></div>
+  <div class="col-6 col-xl-3"><div class="stat-card g4"><div class="label">Food items</div><div class="value">{{ stats.food_items }}</div><small>On the menu</small><i class="bi bi-egg-fried ico"></i></div></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-lg-8"><div class="card-soft p-4 h-100"><h5>Revenue – last 7 days</h5><canvas id="revChart" height="110"></canvas></div></div>
+  <div class="col-lg-4"><div class="card-soft p-4 h-100"><h5>Orders by status</h5>
+    {% if status_chart.values %}<canvas id="statusChart"></canvas>{% else %}<div class="empty">No orders yet</div>{% endif %}</div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-8"><div class="card-soft p-4"><div class="d-flex justify-content-between"><h5>Recent orders</h5><a href="{{ url_for('manage_orders') }}">View all</a></div>
+    <div class="table-responsive"><table class="table"><thead><tr><th>#</th><th>Customer</th><th>Total</th><th>Status</th><th>Placed</th><th></th></tr></thead><tbody>
+    {% for o in recent %}<tr><td>#{{ o.id }}</td><td>{{ o.user.name }}</td><td>{{ o.total_amount|inr }}</td><td>{{ badge(o.status) }}</td><td class="small text-muted">{{ o.created_at|local_dt }}</td><td><a href="{{ url_for('order_details', order_id=o.id) }}">Open</a></td></tr>
+    {% else %}<tr><td colspan="6" class="text-center text-muted py-4">No orders yet</td></tr>{% endfor %}</tbody></table></div></div></div>
+  <div class="col-lg-4"><div class="card-soft p-4 h-100"><h5>Best sellers</h5>
+    {% for item, qty, rev in top %}<div class="top-row"><img class="thumb" src="{{ item|food_img }}" alt=""><div class="flex-grow-1"><div class="fw-semibold">{{ item.name }}</div><small class="text-muted">{{ qty }} sold</small></div><div class="price">{{ rev|inr }}</div></div>
+    {% else %}<div class="empty">Sales will appear here</div>{% endfor %}</div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+const rev = {{ chart|tojson }}, st = {{ status_chart|tojson }};
+new Chart(document.getElementById('revChart'), {type:'line', data:{labels:rev.labels, datasets:[{label:'Revenue (₹)', data:rev.revenue, borderColor:'#e8590c', backgroundColor:'rgba(232,89,12,.15)', fill:true, tension:.4, pointRadius:4, pointBackgroundColor:'#e8590c'}]}, options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, grid:{color:'#f1f3f5'}}, x:{grid:{display:false}}}}});
+const sc = document.getElementById('statusChart');
+if (sc) new Chart(sc, {type:'doughnut', data:{labels:st.labels, datasets:[{data:st.values, backgroundColor:st.colors, borderWidth:0}]}, options:{cutout:'65%', plugins:{legend:{position:'bottom'}}}});
+</script>{% endblock %}

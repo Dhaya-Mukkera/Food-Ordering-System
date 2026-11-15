@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import field %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<div class="container"><div class="card-soft auth-card p-4 p-md-5">
+  <div class="text-center mb-4"><div class="step-icon"><i class="bi bi-person-plus-fill"></i></div><h3>Create your account</h3><p class="text-muted">Start ordering in under a minute</p></div>
+  <form method="post" novalidate>{{ form.hidden_tag() }}{{ field(form.name) }}{{ field(form.email) }}{{ field(form.password) }}{{ field(form.confirm) }}
+    <button class="btn btn-brand w-100 py-2">Sign up</button></form>
+  <p class="text-center mt-3 mb-0 text-muted">Already registered? <a href="{{ url_for('login') }}">Log in</a></p>
+</div></div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import field %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="container py-4"><h2 class="mb-4">Checkout</h2>
+<div class="row g-4"><div class="col-lg-7"><div class="card-soft p-4"><h5 class="mb-3">Delivery details</h5>
+  <form method="post" novalidate>{{ form.hidden_tag() }}{{ field(form.address) }}{{ field(form.phone) }}
+    <h6 class="mt-4">Payment method</h6>
+    <div class="form-check p-3 border rounded-3 bg-light mb-4"><input class="form-check-input ms-0 me-2" type="radio" checked disabled><label class="form-check-label"><i class="bi bi-cash-coin text-success"></i> Cash on Delivery – pay when your food arrives</label></div>
+    <button class="btn btn-brand btn-lg w-100">Place order · {{ total|inr }}</button></form></div></div>
+  <div class="col-lg-5"><div class="card-soft p-4"><h5>Your order</h5><hr>
+    {% for item, qty, sub in lines %}<div class="d-flex align-items-center gap-3 mb-3"><img class="thumb" src="{{ item|food_img }}" alt=""><div class="flex-grow-1"><div class="fw-semibold">{{ item.name }}</div><small class="text-muted">{{ qty }} × {{ item.price|inr }}</small></div><div>{{ sub|inr }}</div></div>{% endfor %}
+    <hr><div class="d-flex justify-content-between fs-5 fw-bold"><span>Total</span><span class="price">{{ total|inr }}</span></div></div></div></div></div>
+{% endblock %}

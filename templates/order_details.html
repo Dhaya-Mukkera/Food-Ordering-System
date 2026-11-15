@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import badge, csrf %}
+{% block title %}Order #{{ order.id }}{% endblock %}
+{% block content %}
+{% set steps = TRACK_STEPS %}{% set idx = steps.index(order.status) if order.status in steps else -1 %}
+{% set icons = ['bi-clock','bi-hand-thumbs-up','bi-fire','bi-bag-check','bi-house-check'] %}
+<div class="container py-4">
+  <a href="{{ url_for('my_orders') if g.user.role == 'customer' else url_for('manage_orders') }}"><i class="bi bi-arrow-left"></i> Back to orders</a>
+  <div class="d-flex justify-content-between flex-wrap align-items-center my-3"><h2 class="mb-0">Order #{{ order.id }}</h2>{{ badge(order.status) }}</div>
+  <div class="card-soft p-4 mb-4">
+    {% if idx >= 0 %}<div class="tracker">{% for s in steps %}
+      <div class="step {{ 'done' if loop.index0 < idx else ('current' if loop.index0 == idx) }}"><div class="dot"><i class="bi {{ 'bi-check-lg' if loop.index0 < idx else icons[loop.index0] }}"></i></div>{{ s }}</div>{% endfor %}</div>
+    {% else %}<div class="alert alert-danger mb-0"><i class="bi bi-x-octagon"></i> This order was {{ order.status|lower }}.</div>{% endif %}
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-8"><div class="card-soft p-4"><h5>Items</h5><div class="table-responsive"><table class="table align-middle">
+      <thead><tr><th>Item</th><th>Price</th><th>Qty</th><th class="text-end">Subtotal</th></tr></thead><tbody>
+      {% for i in order.items %}<tr><td><img class="thumb me-2" src="{{ i.menu_item|food_img }}" alt="">{{ i.menu_item.name }}</td><td>{{ i.price|inr }}</td><td>{{ i.quantity }}</td><td class="text-end">{{ i.subtotal|inr }}</td></tr>{% endfor %}
+      </tbody><tfoot><tr><th colspan="3" class="text-end">Total</th><th class="text-end price">{{ order.total_amount|inr }}</th></tr></tfoot></table></div></div></div>
+    <div class="col-lg-4"><div class="card-soft p-4"><h5>Details</h5>
+      <p class="mb-1 text-muted small">Placed on</p><p>{{ order.created_at|local_dt }}</p>
+      <p class="mb-1 text-muted small">Customer</p><p>{{ order.user.name }}</p>
+      <p class="mb-1 text-muted small">Delivery address</p><p>{{ order.delivery_address }}</p>
+      <p class="mb-1 text-muted small">Phone</p><p>{{ order.phone }}</p>
+      <p class="mb-1 text-muted small">Payment</p><p>{{ order.payment_method }}</p>
+      {% if g.user.role == 'customer' and order.status == 'Pending' %}
+      <form method="post" action="{{ url_for('cancel_order', order_id=order.id) }}" data-confirm="Cancel this order?">{{ csrf() }}<button class="btn btn-outline-danger w-100">Cancel order</button></form>{% endif %}
+      {% if options %}<hr><p class="small text-muted mb-2">Update status</p>
+      {% for s in options %}<form method="post" action="{{ url_for('update_status', order_id=order.id) }}" class="d-inline">{{ csrf() }}<input type="hidden" name="status" value="{{ s }}">
+        <button class="btn btn-sm {{ 'btn-outline-danger' if s in ('Rejected','Cancelled') else 'btn-brand' }}">{{ s }}</button></form> {% endfor %}{% endif %}
+    </div></div>
+  </div>
+</div>{% endblock %}

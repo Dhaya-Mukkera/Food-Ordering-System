@@ -1,0 +1,14 @@
+{% extends 'dashboard_base.html' %}
+{% from '_macros.html' import field %}
+{% block title %}{{ 'Edit' if item else 'Add' }} food item{% endblock %}
+{% block dash %}
+<div class="dash-title"><h2 class="mb-0">{{ 'Edit ' ~ item.name if item else 'Add food item' }}</h2><a href="{{ url_for('manage_food') }}"><i class="bi bi-arrow-left"></i> Back</a></div>
+<div class="card-soft p-4"><form method="post" enctype="multipart/form-data" novalidate>{{ form.hidden_tag() }}
+  <div class="row g-4"><div class="col-lg-7">{{ field(form.name) }}{{ field(form.category_id) }}{{ field(form.description, 4) }}{{ field(form.price) }}{{ field(form.is_available) }}</div>
+  <div class="col-lg-5"><label class="form-label fw-semibold">Photo</label>
+    <img id="imgPreview" class="img-fluid rounded-4 mb-3 w-100" src="{{ item|food_img if item else url_for('static', filename='images/foods/default.svg') }}" alt="">
+    {{ form.image(class='form-control' ~ (' is-invalid' if form.image.errors else '')) }}
+    {% for e in form.image.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+    <small class="text-muted">Leave empty to keep the current image.</small></div></div>
+  <button class="btn btn-brand mt-3 px-4">Save</button></form></div>
+{% endblock %}

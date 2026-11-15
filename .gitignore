@@ -1,0 +1,13 @@
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+instance/*.db
+*.sqlite3
+static/images/foods/up_*
+.vscode/
+*.pem
+instance/*.sqlite
+instance/*.sqlite3
+.pytest_cache/

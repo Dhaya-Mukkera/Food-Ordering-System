@@ -1,0 +1,17 @@
+{% extends 'dashboard_base.html' %}
+{% from '_macros.html' import badge, csrf %}
+{% block title %}Manage orders{% endblock %}
+{% block dash %}
+<div class="dash-title"><h2 class="mb-0">Orders</h2></div>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="cat-chip {{ 'active' if not current }}" href="{{ url_for('manage_orders') }}">All</a>
+  {% for s in ORDER_STATUSES %}<a class="cat-chip {{ 'active' if current == s }}" href="{{ url_for('manage_orders', status=s) }}">{{ s }} <span class="badge text-bg-secondary">{{ counts.get(s, 0) }}</span></a>{% endfor %}
+</div>
+<div class="card-soft p-3"><div class="table-responsive"><table class="table align-middle mb-0">
+  <thead><tr><th>#</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Placed</th><th>Actions</th></tr></thead><tbody>
+  {% for o in orders %}<tr><td><a href="{{ url_for('order_details', order_id=o.id) }}">#{{ o.id }}</a></td><td>{{ o.user.name }}<br><small class="text-muted">{{ o.phone }}</small></td>
+    <td class="small">{% for i in o.items %}{{ i.quantity }}× {{ i.menu_item.name }}{{ ', ' if not loop.last }}{% endfor %}</td><td class="fw-semibold">{{ o.total_amount|inr }}</td><td>{{ badge(o.status) }}</td><td class="small text-muted">{{ o.created_at|local_dt }}</td>
+    <td>{% for s in allowed(o) %}<form method="post" action="{{ url_for('update_status', order_id=o.id) }}" class="d-inline">{{ csrf() }}<input type="hidden" name="status" value="{{ s }}">
+      <button class="btn btn-sm {{ 'btn-outline-danger' if s in ('Rejected','Cancelled') else 'btn-brand' }} mb-1">{{ s }}</button></form> {% else %}<span class="text-muted small">—</span>{% endfor %}</td></tr>
+  {% else %}<tr><td colspan="7"><div class="empty"><i class="bi bi-inbox"></i><p class="mb-0">No orders here.</p></div></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

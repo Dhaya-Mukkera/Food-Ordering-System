@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import badge %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<div class="container py-4"><h2 class="mb-4">My Orders</h2>
+{% if orders %}<div class="row g-3">{% for o in orders %}
+  <div class="col-12"><div class="order-card d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div><div class="fw-bold">Order #{{ o.id }}</div><small class="text-muted">{{ o.created_at|local_dt }}</small>
+      <div class="small mt-1">{% for i in o.items %}{{ i.quantity }}× {{ i.menu_item.name }}{{ ', ' if not loop.last }}{% endfor %}</div></div>
+    <div>{{ badge(o.status) }}</div><div class="price">{{ o.total_amount|inr }}</div>
+    <a class="btn btn-outline-brand btn-sm" href="{{ url_for('order_details', order_id=o.id) }}">Track / details</a></div></div>
+{% endfor %}</div>
+{% else %}<div class="empty card-soft"><i class="bi bi-receipt"></i><h5 class="mt-2">No orders yet</h5><a class="btn btn-brand mt-2" href="{{ url_for('menu') }}">Order something tasty</a></div>{% endif %}
+</div>{% endblock %}

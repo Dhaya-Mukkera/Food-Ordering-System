@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import food_card, csrf %}
+{% block title %}{{ item.name }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <nav class="small mb-3"><a href="{{ url_for('menu') }}">Menu</a> / <a href="{{ url_for('menu', category=item.category_id) }}">{{ item.category.name }}</a> / {{ item.name }}</nav>
+  <div class="card-soft p-3 p-md-4"><div class="row g-4">
+    <div class="col-md-6"><img class="img-fluid rounded-4 w-100" src="{{ item|food_img }}" alt="{{ item.name }}"></div>
+    <div class="col-md-6 d-flex flex-column">
+      <span class="badge text-bg-warning align-self-start mb-2">{{ item.category.name }}</span>
+      <h2>{{ item.name }}</h2>
+      <p class="text-muted">{{ item.description }}</p>
+      <div class="price fs-2 mb-2">{{ item.price|inr }}</div>
+      <p>{% if item.is_available %}<span class="text-success"><i class="bi bi-check-circle-fill"></i> Available now</span>{% else %}<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Currently unavailable</span>{% endif %}</p>
+      {% if item.is_available and (not g.user or g.user.role == 'customer') %}
+      <form method="post" action="{{ url_for('cart_add', item_id=item.id) }}" class="d-flex gap-2 mt-auto">{{ csrf() }}
+        <input type="number" name="quantity" value="1" min="1" max="20" class="form-control qty-input">
+        <button class="btn btn-brand px-4"><i class="bi bi-bag-plus"></i> Add to cart</button></form>
+      {% endif %}
+    </div>
+  </div></div>
+  {% if related %}<h4 class="mt-5 mb-3">You may also like</h4><div class="row g-4">{% for r in related %}<div class="col-6 col-md-3">{{ food_card(r) }}</div>{% endfor %}</div>{% endif %}
+</div>
+{% endblock %}

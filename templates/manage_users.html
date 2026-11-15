@@ -1,0 +1,12 @@
+{% extends 'dashboard_base.html' %}
+{% from '_macros.html' import field, csrf %}
+{% block title %}Users{% endblock %}
+{% block dash %}
+<div class="dash-title"><h2 class="mb-0">Users</h2></div>
+<div class="row g-3"><div class="col-lg-8"><div class="card-soft p-3"><div class="table-responsive"><table class="table align-middle mb-0"><thead><tr><th>User</th><th>Role</th><th>Orders</th><th>Joined</th><th></th></tr></thead><tbody>
+  {% for u in users %}<tr><td><div class="d-flex align-items-center gap-2"><div class="avatar">{{ u.name[0]|upper }}</div><div><div class="fw-semibold">{{ u.name }}</div><small class="text-muted">{{ u.email }}</small></div></div></td>
+    <td><span class="badge {{ {'admin':'text-bg-danger','staff':'text-bg-primary'}.get(u.role,'text-bg-success') }}">{{ u.role|title }}</span></td><td>{{ counts.get(u.id, 0) }}</td><td class="small text-muted">{{ u.created_at|local_dt('%d %b %Y') }}</td>
+    <td class="text-end">{% if u.id != g.user.id %}<form method="post" action="{{ url_for('user_delete', user_id=u.id) }}" data-confirm="Delete {{ u.name }}?">{{ csrf() }}<button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>{% else %}<small class="text-muted">You</small>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></div></div>
+<div class="col-lg-4"><div class="card-soft p-4"><h5>Add staff / admin</h5><form method="post" novalidate>{{ form.hidden_tag() }}{{ field(form.name) }}{{ field(form.email) }}{{ field(form.role) }}{{ field(form.password) }}<button class="btn btn-brand w-100">Create account</button></form></div></div></div>
+{% endblock %}
